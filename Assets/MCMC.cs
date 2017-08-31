@@ -6,22 +6,24 @@ namespace komietty.Math
 {
     public class MCMC
     {
-        public const int LIMIT_RESET_LOOP_COUNT = 100;
-        public Vector3[] Data { get; private set; }
+        public static readonly int LIMIT_RESET_LOOP_COUNT = 100;
+        public Vector4[] Data { get; private set; }
+        public Vector3 Scale { get; private set; }
 
-        private Vector3 _curr;
-        private float _currDensity = 0f;
+        Vector3 _curr;
+        float _currDensity = 0f;
 
-        public MCMC(Vector3[] data)
+        public MCMC(Vector4[] data, Vector3 scale)
         {
             this.Data = data;
+            this.Scale = scale;
         }
 
         public void Reset()
         {
             for (var i = 0; _currDensity <= 0f && i < LIMIT_RESET_LOOP_COUNT; i++)
             {
-                _curr = new Vector3(Random.value, Random.value, Random.value);
+                _curr = new Vector3(Scale.x * Random.value, Scale.y * Random.value, Scale.z * Random.value);
                 _currDensity = Density(_curr);
             }
         }
@@ -63,8 +65,9 @@ namespace komietty.Math
             float weight = 0f;
             for (int i = 0; i < Data.Length; i++)
             {
-                float mag = Vector3.SqrMagnitude(pos - Data[i]);
-                weight += Mathf.Exp(-mag);
+                Vector3 posi = Data[i];
+                float mag = Vector3.SqrMagnitude(pos - posi);
+                weight += Mathf.Exp(-mag) * Data[i].w;
             }
             return weight;
         }
