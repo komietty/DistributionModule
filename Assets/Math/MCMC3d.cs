@@ -1,20 +1,19 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace komietty.Math
 {
-    public class MCMC
+    public class MCMC3d
     {
-        public static readonly int LIMIT_RESET_LOOP_COUNT = 100;
+        public static readonly int limitResetLoopCount = 100;
+        public static readonly int weightReferenceloopCount = 500;
         public Vector4[] Data { get; private set; }
         public Vector3 Scale { get; private set; }
-        public int weightReferenceloopCount = 300;
 
         Vector3 _curr;
         float _currDensity = 0f;
 
-        public MCMC(Vector4[] data, Vector3 scale)
+        public MCMC3d(Vector4[] data, Vector3 scale)
         {
             this.Data = data;
             this.Scale = scale;
@@ -22,10 +21,9 @@ namespace komietty.Math
 
         public void Reset()
         {
-            for (var i = 0; _currDensity <= 0f && i < LIMIT_RESET_LOOP_COUNT; i++)
+            for (var i = 0; _currDensity <= 0f && i < limitResetLoopCount; i++)
             {
                 _curr = new Vector3(Scale.x * Random.value, Scale.y * Random.value, Scale.z * Random.value);
-                Debug.Log(_curr);
                 _currDensity = Density(_curr);
             }
         }
@@ -34,6 +32,7 @@ namespace komietty.Math
         {
             return Sequence(nInitialize, limit, 0);
         }
+
         public IEnumerable<Vector3> Sequence(int nInitialize, int limit, int nSkip)
         {
             Reset();
