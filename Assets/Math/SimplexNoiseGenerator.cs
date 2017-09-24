@@ -82,6 +82,12 @@ namespace komietty.Math
             return (int)Mathf.Lerp(0, 255, val);
         }
 
+        public float getDensityFloat(Vector3 loc)
+        {
+            float val = noise(loc.x, loc.y, loc.z);
+            return Mathf.Lerp(0f, 1f, val);
+        }
+
         // Simplex Noise Generator
         public float noise(float x, float y, float z)
         {

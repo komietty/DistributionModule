@@ -19,7 +19,7 @@ public class Demo3d : MonoBehaviour
         data = new Vector4[lEdge * lEdge * lEdge];
         Prepare();
         mcmc = new MCMC3d(data, lEdge * Vector3.one);
-        StartCoroutine(Generate());
+        StartCoroutine(GenerateFlower());
     }
 
     void Prepare()
@@ -35,7 +35,7 @@ public class Demo3d : MonoBehaviour
                 }
     }
 
-    IEnumerator Generate()
+    IEnumerator GenerateFlower()
     {
         for (int i = 0; i < 200; i++)
         {
@@ -49,6 +49,19 @@ public class Demo3d : MonoBehaviour
                 GameObject flower = Instantiate(prefab, pos, q);
                 FlowerController flowerController = flower.GetComponent<FlowerController>();
                 flowerController.InitializeTexture(mainTexture, subTexture);
+            }
+        }
+    }
+
+    IEnumerator Generate()
+    {
+        while(true)
+        {
+            yield return new WaitForSeconds(0.05f);
+            foreach (var pos in mcmc.Sequence(nInitialize, nlimit))
+            {
+                //yield return new WaitForSeconds(0.01f);
+                Instantiate(prefab, pos, Quaternion.identity);
             }
         }
     }

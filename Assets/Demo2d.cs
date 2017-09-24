@@ -19,7 +19,7 @@ public class Demo2d : MonoBehaviour {
 
     void Start () {
         Prepare();
-        mcmc = new MCMC2d(texture, 1f);
+        mcmc = new MCMC2d(texture, 0.015f);
         StartCoroutine(Generate());
 	}
 	
@@ -48,7 +48,7 @@ public class Demo2d : MonoBehaviour {
         {
             int rand = (int)Mathf.Floor(Random.value * mainTextures.Length);
             var mainTexture = mainTextures[rand];
-            yield return new WaitForSeconds(0.05f);
+            yield return new WaitForSeconds(0.1f);
             foreach (var pos in mcmc.Sequence(nInitialize, nlimit))
             {
                 //yield return new WaitForSeconds(0.01f);

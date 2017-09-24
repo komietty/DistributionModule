@@ -1,36 +1,42 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+
 namespace komietty.Math
 {
-    public class Rejection2d
+    public class Rejection3d
     {
-        public Vector2 PnoiseOrigin { get; private set; }
+        public Vector3 PnoiseOrigin { get; private set; }
         public float NoiseScale { get; private set; }
         public float NoiseAspect { get; private set; }
+        SimplexNoiseGenerator sn;
 
-        public Rejection2d(Vector2 origin, float scale, float aspect)
+        public Rejection3d(Vector3 origin, float scale, float aspect)
         {
             this.PnoiseOrigin = origin;
             this.NoiseScale = scale;
             this.NoiseAspect = aspect;
+            this.sn = new SimplexNoiseGenerator();
         }
 
-        public IEnumerable<Vector2> Sequence(int limit, float threshold)
+        public IEnumerable<Vector3> Sequence(int limit, float threshold)
         {
             float randomX;
             float randomY;
+            float randomZ;
             float noiseValue;
+
             for (int i = 0; i < limit; i++)
             {
                 randomX = Random.value;
                 randomY = Random.value;
-                noiseValue = Mathf.PerlinNoise(
-                    PnoiseOrigin.x + randomX * NoiseScale * NoiseAspect,
-                    PnoiseOrigin.y + randomY * NoiseScale);
+                randomZ = Random.value;
+                noiseValue = sn.getDensityFloat(
+                    new Vector3(randomX, randomY, randomZ) * NoiseScale
+                    );
 
                 if (noiseValue > threshold)
-                    yield return new Vector2(randomX, randomY);
+                    yield return new Vector3(randomX, randomY, randomZ);
                 else
                     Debug.Log(222);
 
@@ -38,3 +44,4 @@ namespace komietty.Math
         }
     }
 }
+

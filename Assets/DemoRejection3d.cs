@@ -4,7 +4,7 @@ using UnityEngine;
 using komietty.Math;
 using komietty.flowerBloom;
 
-public class DemoRejection2d : MonoBehaviour {
+public class DemoRejection3d : MonoBehaviour {
 
     public int lEdge = 20;
     public int limit = 1000;
@@ -15,7 +15,7 @@ public class DemoRejection2d : MonoBehaviour {
     public GameObject prefab;
     public Texture2D[] mainTextures = new Texture2D[0];
     public Texture2D subTexture;
-    Rejection2d rejection2d;
+    Rejection3d rejection3d;
 
     struct DistributionData
     {
@@ -25,9 +25,10 @@ public class DemoRejection2d : MonoBehaviour {
 
     List<DistributionData> distributionDataList = new List<DistributionData>();
 
-	void Start () {
+    void Start()
+    {
 
-        rejection2d = new Rejection2d(Vector2.zero, pnoiseScale, pnoiseAspect);
+        rejection3d = new Rejection3d(Vector3.zero, pnoiseScale, pnoiseAspect);
         StartCoroutine(GenerateFlower());
     }
 
@@ -36,7 +37,7 @@ public class DemoRejection2d : MonoBehaviour {
         while (true)
         {
             yield return new WaitForSeconds(0.001f);
-            foreach (var pos in rejection2d.Sequence(limit, threshold))
+            foreach (var pos in rejection3d.Sequence(limit, threshold))
             {
                 //int texId = whichMainTexIdRandom();
                 var pos_ = pos * lEdge;
@@ -63,14 +64,14 @@ public class DemoRejection2d : MonoBehaviour {
         return (int)Mathf.Floor(Random.value * mainTextures.Length);
     }
 
-    int whichMainTexIdClose(Vector2 position, float minLength)
+    int whichMainTexIdClose(Vector3 position, float minLength)
     {
         int minLengthIndex = -1;
         for (int i = 0; i < distributionDataList.Count; i++)
         {
-            float length = Vector3.SqrMagnitude((Vector3)position - distributionDataList[i].position);
+            float length = Vector3.SqrMagnitude(position - distributionDataList[i].position);
 
-           
+
             if (length < minLength)
             {
                 minLength = length;
@@ -86,6 +87,6 @@ public class DemoRejection2d : MonoBehaviour {
         {
             return (int)Mathf.Floor(Random.value * mainTextures.Length);
         }
-            
+
     }
 }

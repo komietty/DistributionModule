@@ -9,20 +9,16 @@ namespace komietty.Math
     {
         public const int LIMIT_RESET_LOOP_COUNT = 100;
         public Texture2D ProbTex { get; private set; }
-        public float StdDev { get; private set; }
-        public float Aspect { get; private set; }
-        public float Height { get; private set; }
+        public float Sigma { get; private set; }
 
         private Vector2 _curr;
         private float _currDensity = 0f;
         private Vector2 _stddevAspect;
 
-        public MCMC2d(Texture2D probTex, float stddev) : this(probTex, stddev, 1f) { }
-        public MCMC2d(Texture2D probTex, float stddev, float height)
+        public MCMC2d(Texture2D probTex, float sigma)
         {
             this.ProbTex = probTex;
-            this.Height = height;
-            this.StdDev = stddev;
+            this.Sigma = sigma;
         }
 
         public void Reset()
@@ -32,8 +28,6 @@ namespace komietty.Math
                 _curr = new Vector2(Random.value, Random.value);
                 _currDensity = Density(_curr);
             }
-            Aspect = (float)ProbTex.width / ProbTex.height;
-            _stddevAspect = new Vector2(StdDev, StdDev / Aspect);
         }
 
         public IEnumerable<Vector2> Sequence(int nInitialize, int limit)
@@ -58,7 +52,7 @@ namespace komietty.Math
 
         void Next()
         {
-            var next = Vector2.Scale(_stddevAspect, BoxMuller.Gaussian()) + _curr;
+            var next = Sigma * BoxMuller.Gaussian() + _curr;
             next.x -= Mathf.Floor(next.x);
             next.y -= Mathf.Floor(next.y);
 
@@ -71,7 +65,7 @@ namespace komietty.Math
         }
         float Density(Vector2 curr)
         {
-            return Height * ProbTex.GetPixelBilinear(curr.x, curr.y).r;
+            return ProbTex.GetPixelBilinear(curr.x, curr.y).r;
         }
 
     }
