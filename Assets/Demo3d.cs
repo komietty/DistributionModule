@@ -1,16 +1,20 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEditor;
 using komietty.Math;
-using komietty.flowerBloom;
+using vertexAnimator;
 
 public class Demo3d : MonoBehaviour
 {
     public int lEdge = 20;
     public int nInitialize = 100;
     public int nlimit = 100;
+    public int loop = 400;
+    public float threshold = -100;
+    public bool isVertexAnimation;
     public GameObject prefab;
-    public Texture2D[] mainTextures = new Texture2D[0];
-    public Texture2D subTexture;
+    public GameObject[] prefabArr = new GameObject[0];
+    public Texture2D[] Textures = new Texture2D[0];
     Vector4[] data;
     MCMC3d mcmc;
 
@@ -19,7 +23,8 @@ public class Demo3d : MonoBehaviour
         data = new Vector4[lEdge * lEdge * lEdge];
         Prepare();
         mcmc = new MCMC3d(data, lEdge * Vector3.one);
-        StartCoroutine(GenerateFlower());
+        if (isVertexAnimation) StartCoroutine(GenerateWithVertexAnimator());
+        else StartCoroutine(Generate());
     }
 
     void Prepare()
@@ -35,33 +40,33 @@ public class Demo3d : MonoBehaviour
                 }
     }
 
-    IEnumerator GenerateFlower()
+    IEnumerator Generate()
     {
-        for (int i = 0; i < 200; i++)
+        for (int i = 0; i < loop; i++) // or while(true)
         {
-            int rand = (int)Mathf.Floor(Random.value * mainTextures.Length);
-            var mainTexture = mainTextures[rand];
+            int rand = (int)Mathf.Floor(Random.value * prefabArr.Length);
+            var prefab = prefabArr[rand];
             yield return new WaitForSeconds(0.05f);
-            foreach (var pos in mcmc.Sequence(nInitialize, nlimit))
+            foreach (var pos in mcmc.Sequence(nInitialize, nlimit, threshold))
             {
-                //yield return new WaitForSeconds(0.01f);
-                Quaternion q = Quaternion.Euler(-360 * Random.value, -360 * Random.value, -360 * Random.value);
-                GameObject flower = Instantiate(prefab, pos, q);
-                FlowerController flowerController = flower.GetComponent<FlowerController>();
-                flowerController.InitializeTexture(mainTexture, subTexture);
+                Instantiate(prefab, pos, Quaternion.identity);
             }
         }
     }
 
-    IEnumerator Generate()
+    IEnumerator GenerateWithVertexAnimator()
     {
-        while(true)
+        for (int i = 0; i < loop; i++) // or while(true)
         {
+            int rand = (int)Mathf.Floor(Random.value * Textures.Length);
+            var texture = Textures[rand];
             yield return new WaitForSeconds(0.05f);
-            foreach (var pos in mcmc.Sequence(nInitialize, nlimit))
+            foreach (var pos in mcmc.Sequence(nInitialize, nlimit, threshold))
             {
-                //yield return new WaitForSeconds(0.01f);
-                Instantiate(prefab, pos, Quaternion.identity);
+                Quaternion q = Quaternion.Euler(-360 * Random.value, -360 * Random.value, -360 * Random.value);
+                GameObject instance = Instantiate(prefab, pos, q);
+                VertexAnimController VAcontroller = instance.GetComponent<VertexAnimController>();
+                VAcontroller.InitTexture(texture);
             }
         }
     }

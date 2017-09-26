@@ -30,39 +30,42 @@ namespace komietty.Math
             }
         }
 
-        public IEnumerable<Vector2> Sequence(int nInitialize, int limit)
+        public IEnumerable<Vector2> Sequence(int nInitialize, int limit, float threshold)
         {
-            return Sequence(nInitialize, limit, 0);
+            return Sequence(nInitialize, limit, threshold, 0);
         }
-        public IEnumerable<Vector2> Sequence(int nInitialize, int limit, int nSkip)
+        public IEnumerable<Vector2> Sequence(int nInitialize, int limit, float threshold, int nSkip)
         {
             Reset();
 
             for (var i = 0; i < nInitialize; i++)
-                Next();
+                Next(threshold);
 
             for (var i = 0; i < limit; i++)
             {
                 for (var j = 0; j < nSkip; j++)
-                    Next();
+                    Next(threshold);
                 yield return _curr;
-                Next();
+                Next(threshold);
             }
         }
 
-        void Next()
+        void Next(float threshold)
         {
             var next = Sigma * BoxMuller.Gaussian() + _curr;
             next.x -= Mathf.Floor(next.x);
             next.y -= Mathf.Floor(next.y);
 
             var densityNext = Density(next);
-            if (_currDensity <= 0f || Mathf.Min(1f, densityNext / _currDensity) >= Random.value)
+            bool flag1 = _currDensity <= 0f || Mathf.Min(1f, densityNext / _currDensity) >= Random.value;
+            bool flag2 = densityNext > threshold;
+            if (flag1 && flag2)
             {
                 _curr = next;
                 _currDensity = densityNext;
             }
         }
+
         float Density(Vector2 curr)
         {
             return ProbTex.GetPixelBilinear(curr.x, curr.y).r;

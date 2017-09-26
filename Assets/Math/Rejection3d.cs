@@ -38,7 +38,7 @@ namespace komietty.Math
                 if (noiseValue > threshold)
                     yield return new Vector3(randomX, randomY, randomZ);
                 else
-                    Debug.Log(222);
+                    Debug.Log("False");
 
             }
         }
