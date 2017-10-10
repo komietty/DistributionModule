@@ -28,12 +28,7 @@ namespace komietty.Math
             }
         }
 
-        public IEnumerable<Vector3> Sequence(int nInitialize, int limit, float threshold)
-        {
-            return Sequence(nInitialize, limit, threshold, 0);
-        }
-
-        public IEnumerable<Vector3> Sequence(int nInitialize, int limit, float threshold, int nSkip)
+		public IEnumerable<Vector3> Sequence(int nInitialize, int limit, float threshold)
         {
             Reset();
 
@@ -42,8 +37,6 @@ namespace komietty.Math
 
             for (var i = 0; i < limit; i++)
             {
-                for (var j = 0; j < nSkip; j++)
-                    Next(threshold);
                 yield return _curr;
                 Next(threshold);
             }

@@ -14,14 +14,6 @@ namespace komietty.Math
             return Mathf.Exp(-0.5f * (x * x + y * y + z * z)) / Mathf.Pow(2 * Mathf.PI, 1.5f);
         }
 
-        public static float Probability()
-        {
-            var x = Random.value;
-            var y = Random.value;
-            var z = Random.value;
-            return 1f;
-        }
-
         public static Vector3 GenerateRandomPointStandard()
         {
             var x = RandomGenerator.rand_gaussian(0f, 1f);
