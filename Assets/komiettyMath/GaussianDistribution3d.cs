@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace komietty.Math
 {
-    public static class GaussianDistributionCubic
+    public static class GaussianDistribution3d
     {
         public static float ProbablityStandard()
         {

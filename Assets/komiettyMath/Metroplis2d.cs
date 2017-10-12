@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace komietty.Math
 {
-    public class MCMC2d
+    public class Metropolis2d
     {
         public const int LIMIT_RESET_LOOP_COUNT = 100;
         public Texture2D ProbTex { get; private set; }
@@ -15,7 +15,7 @@ namespace komietty.Math
         private float _currDensity = 0f;
         private Vector2 _stddevAspect;
 
-        public MCMC2d(Texture2D probTex, float sigma)
+        public Metropolis2d(Texture2D probTex, float sigma)
         {
             this.ProbTex = probTex;
             this.Sigma = sigma;
@@ -30,11 +30,7 @@ namespace komietty.Math
             }
         }
 
-        public IEnumerable<Vector2> Sequence(int nInitialize, int limit, float threshold)
-        {
-            return Sequence(nInitialize, limit, threshold, 0);
-        }
-        public IEnumerable<Vector2> Sequence(int nInitialize, int limit, float threshold, int nSkip)
+        public IEnumerable<Vector2> Chain(int nInitialize, int limit, float threshold)
         {
             Reset();
 
@@ -43,8 +39,6 @@ namespace komietty.Math
 
             for (var i = 0; i < limit; i++)
             {
-                for (var j = 0; j < nSkip; j++)
-                    Next(threshold);
                 yield return _curr;
                 Next(threshold);
             }

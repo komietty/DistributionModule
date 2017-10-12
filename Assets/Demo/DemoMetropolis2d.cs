@@ -3,7 +3,7 @@ using UnityEngine;
 using komietty.Math;
 using vertexAnimator;
 
-public class Demo2d : MonoBehaviour {
+public class DemoMetropolis2d : MonoBehaviour {
 
     public int lEdge = 20;
     public int nInitialize = 100;
@@ -18,11 +18,11 @@ public class Demo2d : MonoBehaviour {
     public GameObject[] prefabArr = new GameObject[0];
     public Texture2D[] Textures = new Texture2D[0];
     Texture2D tex;
-    MCMC2d mcmc;
+    Metropolis2d metropolis;
 
     void Start () {
         Prepare();
-        mcmc = new MCMC2d(tex, 0.015f);
+        metropolis = new Metropolis2d(tex, 0.015f);
 
         if (isVertexAnimation) StartCoroutine(GenerateWithVertexAnimator());
         else StartCoroutine(Generate());
@@ -56,7 +56,7 @@ public class Demo2d : MonoBehaviour {
             int rand = (int)Mathf.Floor(Random.value * prefabArr.Length);
             var prefab = prefabArr[rand];
             yield return new WaitForSeconds(0.1f);
-            foreach (var pos in mcmc.Sequence(nInitialize, nlimit, threshold))
+            foreach (var pos in metropolis.Chain(nInitialize, nlimit, threshold))
             {
                 var pos_ = pos * lEdge;
                 Instantiate(prefab, pos_, Quaternion.identity);
@@ -71,7 +71,7 @@ public class Demo2d : MonoBehaviour {
             int rand = (int)Mathf.Floor(Random.value * Textures.Length);
             var texture = Textures[rand];
             yield return new WaitForSeconds(0.1f);
-            foreach (var pos in mcmc.Sequence(nInitialize, nlimit, threshold))
+            foreach (var pos in metropolis.Chain(nInitialize, nlimit, threshold))
             {
                 var pos_ = pos * lEdge;
                 Quaternion q = Quaternion.Euler(-90, 0, 0);

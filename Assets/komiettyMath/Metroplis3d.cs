@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace komietty.Math
 {
-    public class MCMC3d
+    public class Metropolis3d
     {
         public static readonly int limitResetLoopCount = 100;
         public static readonly int weightReferenceloopCount = 500;
@@ -13,7 +13,7 @@ namespace komietty.Math
         Vector3 _curr;
         float _currDensity = 0f;
 
-        public MCMC3d(Vector4[] data, Vector3 scale)
+        public Metropolis3d(Vector4[] data, Vector3 scale)
         {
             this.Data = data;
             this.Scale = scale;
@@ -28,7 +28,7 @@ namespace komietty.Math
             }
         }
 
-		public IEnumerable<Vector3> Sequence(int nInitialize, int limit, float threshold)
+		public IEnumerable<Vector3> Chain(int nInitialize, int limit, float threshold)
         {
             Reset();
 
@@ -44,7 +44,7 @@ namespace komietty.Math
 
         void Next(float threshold)
         {
-            Vector3 next = GaussianDistributionCubic.GenerateRandomPointStandard() + _curr;
+            Vector3 next = GaussianDistribution3d.GenerateRandomPointStandard() + _curr;
 
             var densityNext = Density(next);
             bool flag1 = _currDensity <= 0f || Mathf.Min(1f, densityNext / _currDensity) >= Random.value;

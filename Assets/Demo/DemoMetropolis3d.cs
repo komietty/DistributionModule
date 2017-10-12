@@ -1,10 +1,9 @@
 ﻿using System.Collections;
 using UnityEngine;
-using UnityEditor;
 using komietty.Math;
 using vertexAnimator;
 
-public class Demo3d : MonoBehaviour
+public class DemoMetropolis3d : MonoBehaviour
 {
     public int lEdge = 20;
     public int nInitialize = 100;
@@ -16,13 +15,13 @@ public class Demo3d : MonoBehaviour
     public GameObject[] prefabArr = new GameObject[0];
     public Texture2D[] Textures = new Texture2D[0];
     Vector4[] data;
-    MCMC3d mcmc;
+    Metropolis3d metropolis;
 
     void Start()
     {
         data = new Vector4[lEdge * lEdge * lEdge];
         Prepare();
-        mcmc = new MCMC3d(data, lEdge * Vector3.one);
+        metropolis = new Metropolis3d(data, lEdge * Vector3.one);
         if (isVertexAnimation) StartCoroutine(GenerateWithVertexAnimator());
         else StartCoroutine(Generate());
     }
@@ -47,7 +46,7 @@ public class Demo3d : MonoBehaviour
             int rand = (int)Mathf.Floor(Random.value * prefabArr.Length);
             var prefab = prefabArr[rand];
             yield return new WaitForSeconds(0.05f);
-            foreach (var pos in mcmc.Sequence(nInitialize, nlimit, threshold))
+            foreach (var pos in metropolis.Chain(nInitialize, nlimit, threshold))
             {
                 Instantiate(prefab, pos, Quaternion.identity);
             }
@@ -61,7 +60,7 @@ public class Demo3d : MonoBehaviour
             int rand = (int)Mathf.Floor(Random.value * Textures.Length);
             var texture = Textures[rand];
             yield return new WaitForSeconds(0.05f);
-            foreach (var pos in mcmc.Sequence(nInitialize, nlimit, threshold))
+            foreach (var pos in metropolis.Chain(nInitialize, nlimit, threshold))
             {
                 Quaternion q = Quaternion.Euler(-360 * Random.value, -360 * Random.value, -360 * Random.value);
                 GameObject instance = Instantiate(prefab, pos, q);
