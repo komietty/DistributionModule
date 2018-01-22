@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
-using komietty.Math;
+using MCMC;
 using vertexAnimator;
 
 public class DemoMetropolis3d : MonoBehaviour
@@ -10,9 +10,7 @@ public class DemoMetropolis3d : MonoBehaviour
     public int nlimit = 100;
     public int loop = 400;
     public float threshold = -100;
-    public bool isVertexAnimation;
     public GameObject prefab;
-    public GameObject[] prefabArr = new GameObject[0];
     public Texture2D[] Textures = new Texture2D[0];
     Vector4[] data;
     Metropolis3d metropolis;
@@ -22,8 +20,7 @@ public class DemoMetropolis3d : MonoBehaviour
         data = new Vector4[lEdge * lEdge * lEdge];
         Prepare();
         metropolis = new Metropolis3d(data, lEdge * Vector3.one);
-        if (isVertexAnimation) StartCoroutine(GenerateWithVertexAnimator());
-        else StartCoroutine(Generate());
+        StartCoroutine(GenerateWithVertexAnimator());
     }
 
     void Prepare()
@@ -37,20 +34,6 @@ public class DemoMetropolis3d : MonoBehaviour
                     var val = sn.noise(x, y, z);
                     data[i] = new Vector4(x, y, z, val);
                 }
-    }
-
-    IEnumerator Generate()
-    {
-        for (int i = 0; i < loop; i++) // or while(true)
-        {
-            int rand = (int)Mathf.Floor(Random.value * prefabArr.Length);
-            var prefab = prefabArr[rand];
-            yield return new WaitForSeconds(0.05f);
-            foreach (var pos in metropolis.Chain(nInitialize, nlimit, threshold))
-            {
-                Instantiate(prefab, pos, Quaternion.identity);
-            }
-        }
     }
 
     IEnumerator GenerateWithVertexAnimator()
