@@ -17,23 +17,26 @@ public class DemoMetropolis3d : MonoBehaviour
 
     void Start()
     {
-        data = new Vector4[lEdge * lEdge * lEdge];
-        Prepare();
-        metropolis = new Metropolis3d(data, lEdge * Vector3.one);
+        data = Prepare();
+        var sn = new SimplexNoiseGenerator();
+        metropolis = new Metropolis3d(lEdge * Vector3.one, data, null);
         StartCoroutine(GenerateWithVertexAnimator());
     }
 
-    void Prepare()
+    Vector4[] Prepare()
     {
         var sn = new SimplexNoiseGenerator();
+        var distribution = new Vector4[lEdge * lEdge * lEdge];
         for (int x = 0; x < lEdge; x++)
             for (int y = 0; y < lEdge; y++)
                 for (int z = 0; z < lEdge; z++)
                 {
                     var i = x + lEdge * y + lEdge * lEdge * z;
                     var val = sn.noise(x, y, z);
-                    data[i] = new Vector4(x, y, z, val);
+                    distribution[i] = new Vector4(x, y, z, val);
                 }
+
+        return distribution;
     }
 
     IEnumerator GenerateWithVertexAnimator()
@@ -47,6 +50,7 @@ public class DemoMetropolis3d : MonoBehaviour
             {
                 Quaternion q = Quaternion.Euler(-360 * Random.value, -360 * Random.value, -360 * Random.value);
                 GameObject instance = Instantiate(prefab, pos, q);
+                instance.transform.SetParent(transform, false);
                 VertexAnimController VAcontroller = instance.GetComponent<VertexAnimController>();
                 VAcontroller.InitTexture(texture);
             }

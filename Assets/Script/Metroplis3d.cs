@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 namespace MCMC
 {
@@ -7,23 +8,25 @@ namespace MCMC
     {
         public static readonly int limitResetLoopCount = 100;
         public static readonly int weightReferenceloopCount = 500;
-        public Vector4[] Data { get; private set; }
         public Vector3 Scale { get; private set; }
+        public Vector4[] Data { get; private set; }
+        public Func<float, float, float, float> DensityFunc{ get; private set; }
 
         Vector3 _curr;
         float _currDensity = 0f;
 
-        public Metropolis3d(Vector4[] data, Vector3 scale)
+        public Metropolis3d(Vector3 scale, Vector4[] data = null, Func<float, float, float, float> densityFunc = null)
         {
-            this.Data = data;
             this.Scale = scale;
+            this.Data = data;
+            this.DensityFunc = densityFunc;
         }
 
         public void Reset()
         {
             for (var i = 0; _currDensity <= 0f && i < limitResetLoopCount; i++)
             {
-                _curr = new Vector3(Scale.x * Random.value, Scale.y * Random.value, Scale.z * Random.value);
+                _curr = Vector3.Scale(new Vector3(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value), Scale);
                 _currDensity = Density(_curr);
             }
         }
@@ -47,7 +50,7 @@ namespace MCMC
             Vector3 next = GaussianDistribution3d.GenerateRandomPointStandard() + _curr;
 
             var densityNext = Density(next);
-            bool flag1 = _currDensity <= 0f || Mathf.Min(1f, densityNext / _currDensity) >= Random.value;
+            bool flag1 = _currDensity <= 0f || Mathf.Min(1f, densityNext / _currDensity) >= UnityEngine.Random.value;
             bool flag2 = densityNext > threshold;
             if (flag1 && flag2)
             {
@@ -59,12 +62,28 @@ namespace MCMC
         float Density(Vector3 pos)
         {
             float weight = 0f;
-            for (int i = 0; i < weightReferenceloopCount; i++)
+
+            if(this.DensityFunc != null)
             {
-                int id = (int)Mathf.Floor(Random.value * (Data.Length - 1));
-                Vector3 posi = Data[id];
-                float mag = Vector3.SqrMagnitude(pos - posi);
-                weight += Mathf.Exp(-mag) * Data[id].w;
+                for (int i = 0; i < weightReferenceloopCount; i++)
+                {
+                    var x = UnityEngine.Random.value * Scale.x;
+                    var y = UnityEngine.Random.value * Scale.y;
+                    var z = UnityEngine.Random.value * Scale.z;
+                    var posi = new Vector3(x, y, z);
+                    float mag = Vector3.SqrMagnitude(pos - posi);
+                    weight += Mathf.Exp(-mag) * DensityFunc(x, y, z);
+                }
+            }
+            else if (this.Data != null)
+            {
+                for (int i = 0; i < weightReferenceloopCount; i++)
+                {
+                    int id = (int)Mathf.Floor(UnityEngine.Random.value * (Data.Length - 1));
+                    Vector3 posi = Data[id];
+                    float mag = Vector3.SqrMagnitude(pos - posi);
+                    weight += Mathf.Exp(-mag) * Data[id].w;
+                }
             }
             return weight;
         }
