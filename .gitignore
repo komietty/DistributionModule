@@ -30,4 +30,6 @@ sysinfo.txt
 # Builds
 *.apk
 
+/.vs/
+
 .DS_Store
