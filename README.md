@@ -1,4 +1,4 @@
-# UnityMCMC
+# UMCMC
 
 Instance distributing program using MCMC method.  
 This program affords to make fast cluster sampling following proposed scalar field.
